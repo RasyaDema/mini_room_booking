@@ -1,0 +1,88 @@
+<?php
+require_once __DIR__ . '/../models/Timeslot.php';
+require_once __DIR__ . '/../middleware/csrf.php';
+
+class TimeslotController
+{
+    public function index()
+    {
+        // admin only
+        if (empty($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
+            $_SESSION['flash']['error'] = 'Unauthorized';
+            header('Location: ?');
+            return;
+        }
+        $timeslots = Timeslot::all();
+        require __DIR__ . '/../views/timeslots/index.php';
+    }
+
+    public function store($data)
+    {
+        if (!validate_csrf($data['_csrf'] ?? '')) {
+            $_SESSION['flash']['error'] = 'Invalid CSRF token.';
+            header('Location: ?action=timeslots');
+            return;
+        }
+        if (empty($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
+            $_SESSION['flash']['error'] = 'Unauthorized';
+            header('Location: ?action=timeslots');
+            return;
+        }
+        $name = trim($data['name'] ?? '');
+        $start = trim($data['start_time'] ?? '');
+        $end = trim($data['end_time'] ?? '');
+        if (!$name || !$start || !$end) {
+            $_SESSION['flash']['error'] = 'All fields are required.';
+            header('Location: ?action=timeslots');
+            return;
+        }
+        Timeslot::create(['name'=>$name,'start_time'=>$start,'end_time'=>$end]);
+        $_SESSION['flash']['success'] = 'Timeslot created.';
+        header('Location: ?action=timeslots');
+    }
+
+    public function delete($data)
+    {
+        if (!validate_csrf($data['_csrf'] ?? '')) {
+            $_SESSION['flash']['error'] = 'Invalid CSRF token.';
+            header('Location: ?action=timeslots');
+            return;
+        }
+        if (empty($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
+            $_SESSION['flash']['error'] = 'Unauthorized';
+            header('Location: ?action=timeslots');
+            return;
+        }
+        $id = (int)($data['id'] ?? 0);
+        if ($id) {
+            Timeslot::delete($id);
+            $_SESSION['flash']['success'] = 'Timeslot deleted.';
+        }
+        header('Location: ?action=timeslots');
+    }
+
+    public function update($data)
+    {
+        if (!validate_csrf($data['_csrf'] ?? '')) {
+            $_SESSION['flash']['error'] = 'Invalid CSRF token.';
+            header('Location: ?action=timeslots');
+            return;
+        }
+        if (empty($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
+            $_SESSION['flash']['error'] = 'Unauthorized';
+            header('Location: ?action=timeslots');
+            return;
+        }
+        $id = (int)($data['id'] ?? 0);
+        $name = trim($data['name'] ?? '');
+        $start = trim($data['start_time'] ?? '');
+        $end = trim($data['end_time'] ?? '');
+        if ($id && $name && $start && $end) {
+            Timeslot::update($id, ['name'=>$name,'start_time'=>$start,'end_time'=>$end]);
+            $_SESSION['flash']['success'] = 'Timeslot updated.';
+        } else {
+            $_SESSION['flash']['error'] = 'Invalid input.';
+        }
+        header('Location: ?action=timeslots');
+    }
+}
