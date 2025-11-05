@@ -38,4 +38,24 @@ class Timeslot
         $stmt = $pdo->prepare('DELETE FROM timeslots WHERE id = ?');
         return $stmt->execute([$id]);
     }
+
+    /**
+     * Find any timeslot that overlaps the provided time range.
+     * If $excludeId is provided, exclude that id (useful for update).
+     * Returns the overlapping row or false.
+     */
+    public static function findOverlap($start_time, $end_time, $excludeId = null)
+    {
+        $pdo = getPDO();
+        $sql = 'SELECT * FROM timeslots WHERE NOT (end_time <= ? OR start_time >= ?)';
+        $params = [$start_time, $end_time];
+        if ($excludeId) {
+            $sql .= ' AND id != ?';
+            $params[] = (int)$excludeId;
+        }
+        $sql .= ' LIMIT 1';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch();
+    }
 }

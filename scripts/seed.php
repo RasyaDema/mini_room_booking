@@ -1,4 +1,4 @@
-<?php
+  <?php
 // Seed demo users and rooms with password_hash. Run from CLI or browser (once).
 require_once __DIR__ . '/../app/config/constants.php';
 require_once __DIR__ . '/../app/config/db.php';

@@ -36,6 +36,19 @@ class TimeslotController
             header('Location: ?action=timeslots');
             return;
         }
+        // validate ordering
+        if ($start >= $end) {
+            $_SESSION['flash']['error'] = 'Start time must be before end time.';
+            header('Location: ?action=timeslots');
+            return;
+        }
+        // check overlap
+        $overlap = Timeslot::findOverlap($start, $end);
+        if ($overlap) {
+            $_SESSION['flash']['error'] = 'Timeslot overlaps with existing timeslot: ' . ($overlap['name'] ?? '');
+            header('Location: ?action=timeslots');
+            return;
+        }
         Timeslot::create(['name'=>$name,'start_time'=>$start,'end_time'=>$end]);
         $_SESSION['flash']['success'] = 'Timeslot created.';
         header('Location: ?action=timeslots');
@@ -78,6 +91,19 @@ class TimeslotController
         $start = trim($data['start_time'] ?? '');
         $end = trim($data['end_time'] ?? '');
         if ($id && $name && $start && $end) {
+            // validate ordering
+            if ($start >= $end) {
+                $_SESSION['flash']['error'] = 'Start time must be before end time.';
+                header('Location: ?action=timeslots');
+                return;
+            }
+            // check overlap excluding current id
+            $overlap = Timeslot::findOverlap($start, $end, $id);
+            if ($overlap) {
+                $_SESSION['flash']['error'] = 'Timeslot overlaps with existing timeslot: ' . ($overlap['name'] ?? '');
+                header('Location: ?action=timeslots');
+                return;
+            }
             Timeslot::update($id, ['name'=>$name,'start_time'=>$start,'end_time'=>$end]);
             $_SESSION['flash']['success'] = 'Timeslot updated.';
         } else {

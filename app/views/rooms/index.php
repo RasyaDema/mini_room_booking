@@ -62,14 +62,26 @@
             <form method="post" action="?action=create_booking" id="bookingForm">
                 <input type="hidden" name="_csrf" value="<?php echo csrf_token(); ?>">
                 <input type="hidden" name="room_id" id="room_id">
-                <div class="form-group">
-                    <label for="start_time">Start</label>
-                    <input id="start_time" name="start_time" type="datetime-local" required>
-                </div>
-                <div class="form-group">
-                    <label for="end_time">End</label>
-                    <input id="end_time" name="end_time" type="datetime-local" required>
-                </div>
+                            <div class="form-group">
+                                <label for="timeslot_select">Timeslot (optional)</label>
+                                <select id="timeslot_select" name="timeslot_id">
+                                    <option value="">-- choose a timeslot --</option>
+                                    <?php if (!empty($timeslots)): ?>
+                                        <?php foreach ($timeslots as $ts): ?>
+                                            <option value="<?php echo (int)$ts['id']; ?>" data-start="<?php echo htmlspecialchars($ts['start_time']); ?>" data-end="<?php echo htmlspecialchars($ts['end_time']); ?>"><?php echo htmlspecialchars($ts['name'] . ' (' . substr($ts['start_time'],0,5) . ' - ' . substr($ts['end_time'],0,5) . ')'); ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                                <small class="muted">Selecting a timeslot will autofill the start/end fields for today's date (you can edit before submitting).</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="start_time">Start</label>
+                                <input id="start_time" name="start_time" type="datetime-local" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="end_time">End</label>
+                                <input id="end_time" name="end_time" type="datetime-local" required>
+                            </div>
                 <button type="submit" class="btn">Request Booking</button>
             </form>
         </div>

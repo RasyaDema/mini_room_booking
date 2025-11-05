@@ -15,14 +15,13 @@
                     <td><?php echo htmlspecialchars($t['start_time']); ?></td>
                     <td><?php echo htmlspecialchars($t['end_time']); ?></td>
                     <td>
-                        <form method="post" action="?action=timeslot_update" style="display:inline">
-                            <input type="hidden" name="_csrf" value="<?php echo csrf_token(); ?>">
-                            <input type="hidden" name="id" value="<?php echo (int)$t['id']; ?>">
-                            <input type="hidden" name="name" value="<?php echo htmlspecialchars($t['name'], ENT_QUOTES); ?>">
-                            <input type="hidden" name="start_time" value="<?php echo htmlspecialchars($t['start_time']); ?>">
-                            <input type="hidden" name="end_time" value="<?php echo htmlspecialchars($t['end_time']); ?>">
-                            <button type="submit" class="btn btn--secondary" onclick="return confirm('Edit timeslot via the quick editor? (not implemented)')">Edit</button>
-                        </form>
+                        <button type="button" class="btn btn--secondary edit-timeslot"
+                                data-id="<?php echo (int)$t['id']; ?>"
+                                data-name="<?php echo htmlspecialchars($t['name'], ENT_QUOTES); ?>"
+                                data-start="<?php echo htmlspecialchars($t['start_time']); ?>"
+                                data-end="<?php echo htmlspecialchars($t['end_time']); ?>">
+                            Edit
+                        </button>
                         <form method="post" action="?action=timeslot_delete" style="display:inline;margin-left:.5rem">
                             <input type="hidden" name="_csrf" value="<?php echo csrf_token(); ?>">
                             <input type="hidden" name="id" value="<?php echo (int)$t['id']; ?>">
@@ -56,3 +55,28 @@
     </form>
 
 </section>
+
+<!-- Edit timeslot modal -->
+<div id="timeslotModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <button class="close">×</button>
+        <h3>Edit Timeslot</h3>
+        <form method="post" action="?action=timeslot_update" id="timeslotEditForm">
+            <input type="hidden" name="_csrf" value="<?php echo csrf_token(); ?>">
+            <input type="hidden" name="id" id="ts_edit_id">
+            <div class="form-group">
+                <label for="ts_edit_name">Name</label>
+                <input id="ts_edit_name" name="name" type="text" required>
+            </div>
+            <div class="form-group">
+                <label for="ts_edit_start">Start time</label>
+                <input id="ts_edit_start" name="start_time" type="time" required>
+            </div>
+            <div class="form-group">
+                <label for="ts_edit_end">End time</label>
+                <input id="ts_edit_end" name="end_time" type="time" required>
+            </div>
+            <button type="submit" class="btn btn--primary">Save changes</button>
+        </form>
+    </div>
+</div>
