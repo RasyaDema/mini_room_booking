@@ -6,6 +6,9 @@
     <p>Manage predefined timeslots used for quick booking ranges.</p>
 
     <?php if (!empty($timeslots)): ?>
+        <div style="margin-bottom:.5rem">
+            <a class="btn btn--secondary" href="?action=export_timeslots_csv">Export CSV</a>
+        </div>
         <table class="responsive-table">
             <thead><tr><th>Name</th><th>Start</th><th>End</th><th>Actions</th></tr></thead>
             <tbody>

@@ -9,7 +9,9 @@
     </form>
 
     <?php if (!empty($total)): ?>
-        <p><small>Showing page <?php echo (int)($page ?? 1); ?> of <?php echo (int)$totalPages; ?> — <?php echo (int)$total; ?> rooms found.</small></p>
+        <p><small>Showing page <?php echo (int)($page ?? 1); ?> of <?php echo (int)$totalPages; ?> — <?php echo (int)$total; ?> rooms found.</small>
+        <span style="margin-left:1rem"><a class="btn btn--secondary" href="?action=export_rooms_csv<?php echo $q ? '&q='.urlencode($q):''; ?>">Export CSV</a></span>
+        </p>
     <?php endif; ?>
 
     <div class="room-grid">

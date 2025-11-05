@@ -61,3 +61,40 @@ INSERT IGNORE INTO timeslots (id,name,start_time,end_time,created_at) VALUES
 (1,'Morning','08:00:00','10:00:00',NOW()),
 (2,'Late Morning','10:00:00','12:00:00',NOW()),
 (3,'Afternoon','13:00:00','15:00:00',NOW());
+
+-- password_resets for reset token workflow
+CREATE TABLE IF NOT EXISTS password_resets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(150) NOT NULL,
+  token_hash VARCHAR(255) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME DEFAULT NOW(),
+  INDEX (email),
+  INDEX (token_hash)
+);
+
+-- persistent logins for "remember me" (selector/token pattern)
+CREATE TABLE IF NOT EXISTS persistent_logins (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  selector VARCHAR(24) NOT NULL,
+  token_hash VARCHAR(128) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME DEFAULT NOW(),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX (selector),
+  INDEX (user_id)
+);
+
+-- activity logs for auditing user actions
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT DEFAULT NULL,
+  action VARCHAR(100) NOT NULL,
+  details TEXT,
+  ip VARCHAR(45) DEFAULT NULL,
+  user_agent VARCHAR(255) DEFAULT NULL,
+  created_at DATETIME DEFAULT NOW(),
+  INDEX (user_id),
+  INDEX (action)
+);

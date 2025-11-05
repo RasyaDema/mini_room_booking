@@ -3,6 +3,9 @@
     <?php if (empty($bookings)): ?>
         <p>No bookings yet.</p>
     <?php else: ?>
+        <div style="margin-bottom:.5rem">
+            <a class="btn btn--secondary" href="?action=export_bookings_csv">Export CSV</a>
+        </div>
         <table class="responsive-table">
             <thead>
                 <tr>

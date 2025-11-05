@@ -16,6 +16,29 @@ class TimeslotController
         require __DIR__ . '/../views/timeslots/index.php';
     }
 
+    public function exportCsv()
+    {
+        if (empty($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
+            $_SESSION['flash']['error'] = 'Unauthorized';
+            header('Location: ?');
+            return;
+        }
+        $timeslots = Timeslot::all();
+        $filename = 'timeslots_' . date('Ymd_His') . '.csv';
+    // log export
+    require_once __DIR__ . '/../helpers/logger.php';
+    activity_log('export.timeslots', ['count'=>count($timeslots)], $_SESSION['user_id'] ?? null);
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        $out = fopen('php://output','w');
+        fputcsv($out, ['id','name','start_time','end_time','created_at']);
+        foreach ($timeslots as $t) {
+            fputcsv($out, [$t['id'],$t['name'],$t['start_time'],$t['end_time'],$t['created_at']]);
+        }
+        fclose($out);
+        exit;
+    }
+
     public function store($data)
     {
         if (!validate_csrf($data['_csrf'] ?? '')) {
@@ -49,7 +72,10 @@ class TimeslotController
             header('Location: ?action=timeslots');
             return;
         }
-        Timeslot::create(['name'=>$name,'start_time'=>$start,'end_time'=>$end]);
+        $tsId = Timeslot::create(['name'=>$name,'start_time'=>$start,'end_time'=>$end]);
+        // log timeslot creation
+        require_once __DIR__ . '/../helpers/logger.php';
+        activity_log('timeslot.create', ['timeslot_id'=>$tsId,'name'=>$name,'start_time'=>$start,'end_time'=>$end], $_SESSION['user_id'] ?? null);
         $_SESSION['flash']['success'] = 'Timeslot created.';
         header('Location: ?action=timeslots');
     }
@@ -69,6 +95,9 @@ class TimeslotController
         $id = (int)($data['id'] ?? 0);
         if ($id) {
             Timeslot::delete($id);
+            // log deletion
+            require_once __DIR__ . '/../helpers/logger.php';
+            activity_log('timeslot.delete', ['timeslot_id'=>$id], $_SESSION['user_id'] ?? null);
             $_SESSION['flash']['success'] = 'Timeslot deleted.';
         }
         header('Location: ?action=timeslots');
@@ -105,6 +134,9 @@ class TimeslotController
                 return;
             }
             Timeslot::update($id, ['name'=>$name,'start_time'=>$start,'end_time'=>$end]);
+            // log update
+            require_once __DIR__ . '/../helpers/logger.php';
+            activity_log('timeslot.update', ['timeslot_id'=>$id,'name'=>$name,'start_time'=>$start,'end_time'=>$end], $_SESSION['user_id'] ?? null);
             $_SESSION['flash']['success'] = 'Timeslot updated.';
         } else {
             $_SESSION['flash']['error'] = 'Invalid input.';

@@ -14,5 +14,9 @@
             <input id="password" name="password" type="password" required minlength="6" placeholder="password">
         </div>
         <button type="submit" class="btn btn--primary">Login</button>
+    <div style="margin-top:.6rem;display:flex;align-items:center;gap:.5rem">
+        <label style="display:inline-flex;align-items:center;gap:.35rem"><input type="checkbox" name="remember"> Remember me</label>
+        <span style="margin-left:auto"><a href="?action=password_request">Forgot your password?</a></span>
+    </div>
     </form>
 </section>
